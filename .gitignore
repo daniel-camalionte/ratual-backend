@@ -1,0 +1,23 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+!.env.*.example
+.pytest_cache/
+.ruff_cache/
+*.log
+logs/
+dist/
+build/
+*.egg-info/
+.idea/
+.vscode/
+
+# dados reais exportados para migração entre ambientes (nunca versionar)
+private/
+
+# logs e backups locais
+private/

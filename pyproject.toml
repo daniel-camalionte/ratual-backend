@@ -1,0 +1,20 @@
+[project]
+name = "ratual-backend"
+version = "0.1.0"
+description = "API do Ratual."
+requires-python = ">=3.9"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "C4", "SIM"]
+ignore = ["UP007", "UP045"]  # mantém Optional[...] (Python 3.9 no servidor)
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S105", "S106"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

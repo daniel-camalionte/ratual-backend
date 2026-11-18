@@ -1,0 +1,20 @@
+services:
+  api:
+    image: ratual-backend-api
+    build: .
+    ports:
+      - "8000:8000"
+    # Variáveis vêm do .env local, que NUNCA é versionado nem entra na imagem.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      APP_ENV: development
+    read_only: true            # filesystem imutável: a API não precisa gravar em disco
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped

@@ -1,0 +1,3 @@
+docs/PLAYBOOK_NOVO_PROJETO_KINGHOST*.md text eol=lf
+docs/frozen.sha256 text eol=lf
+.githooks/* text eol=lf

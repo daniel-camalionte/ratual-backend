@@ -1,0 +1,11 @@
+# Dependências de produção — versões validadas em Python 3.9 (mesma versão do servidor KingHost).
+# Só pacotes com wheel pronto (sem compilar): não há compilador nem root no servidor.
+# Antes de adicionar/atualizar, confirme a resolução (ver docs/referencia/GUIA_BACKEND.md §4).
+flask==3.1.3
+flask-cors==6.0.5
+flask-limiter==3.11.0
+orjson==3.11.5
+pydantic==2.13.5
+pydantic-settings==2.11.0
+flask-openapi3==4.2.1
+flask-openapi3-swagger==5.31.0

@@ -1,0 +1,12 @@
+#!/bin/sh
+# Bloqueia commits que alterem documentos congelados (ver scripts/check_frozen.py).
+# Ativar neste clone:  git config core.hooksPath .githooks
+cd "$(git rev-parse --show-toplevel)" || exit 1
+for py in .venv/Scripts/python.exe .venv/bin/python python3 python; do
+  if command -v "$py" >/dev/null 2>&1 || [ -x "$py" ]; then
+    "$py" scripts/check_frozen.py || exit 1
+    exit 0
+  fi
+done
+echo "pre-commit: Python não encontrado; pulando a verificação de documentos congelados." >&2
+exit 0
