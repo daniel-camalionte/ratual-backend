@@ -4,9 +4,11 @@ from flask_openapi3 import Info, OpenAPI, Server
 
 from app.api import register_blueprints
 from app.config import Settings, get_settings
+from app.core.auth import register_docs_guard, register_origin_check
 from app.core.errors import register_error_handlers, validation_error_response
 from app.core.http import register_http_hooks
 from app.core.logging import configure_logging
+from app.db import init_db
 from app.extensions import build_limiter, cors
 from app.schemas.common import ErrorResponse
 from app.version import __version__
@@ -52,7 +54,10 @@ def create_app(settings: Optional[Settings] = None) -> OpenAPI:
     limiter = build_limiter(settings)
     limiter.init_app(app)
     app.extensions["limiter"] = limiter
+    init_db(app, settings)
     register_error_handlers(app)
-    register_blueprints(app)
+    register_origin_check(app, settings)
+    register_docs_guard(app, settings)
+    register_blueprints(app, limiter)
     limiter.exempt(app.blueprints["health"])  # monitoramento não consome cota
     return app

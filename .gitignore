@@ -21,3 +21,9 @@ private/
 
 # logs e backups locais
 private/
+
+# tokens/fotos gerados em execucao (EZVIZ)
+storage/
+# cargas de dados reais (clientes, aparelhos, hash de senha inicial): nunca versionar
+migrations/sql/002_carga_inicial.sql
+migrations/sql/011_carga_planos.sql

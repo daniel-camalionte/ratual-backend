@@ -35,11 +35,12 @@ def test_docs_disabled_by_default_in_production():
     assert client.get("/v1/hello").status_code == 200
 
 
-def test_docs_can_be_enabled_in_production():
+def test_docs_ligado_em_producao_exige_master():
     settings = Settings(
         app_env="production", secret_key="x" * 40, docs_enabled=True, _env_file=None
     )
-    assert create_app(settings).test_client().get("/docs/openapi.json").status_code == 200
+    # ligado, mas protegido: sem login (ou sem ser master) responde 404, como se não existisse
+    assert create_app(settings).test_client().get("/docs/openapi.json").status_code == 404
 
 
 def test_openapi_server_uses_public_base_path():
@@ -72,3 +73,32 @@ def test_local_wsgi_mounts_api_under_prefix(monkeypatch):
     assert c.get("/api/health").status_code == 200
     assert c.get("/v1/hello").status_code == 404
     get_settings.cache_clear()
+
+
+def _prod_docs_client(monkeypatch, usuario):
+    from app.services import auth as auth_service
+
+    monkeypatch.setattr(auth_service, "usuario_da_sessao", lambda token: usuario)
+    settings = Settings(
+        app_env="production", secret_key="x" * 40, docs_enabled=True, _env_file=None
+    )
+    client = create_app(settings).test_client()
+    client.set_cookie("ratual_session", "token", domain="localhost", path="/")
+    return client
+
+
+def test_docs_em_producao_so_para_master(monkeypatch):
+    master = {"id_usuario": 1, "id_empresa": 1, "tipo_empresa": "master", "perfil": "admin"}
+    cliente = {"id_usuario": 2, "id_empresa": 2, "tipo_empresa": "cliente", "perfil": "admin"}
+
+    c = _prod_docs_client(monkeypatch, master)
+    assert c.get("/docs/swagger").status_code == 200
+    assert c.get("/docs/openapi.json").status_code == 200
+
+    c = _prod_docs_client(monkeypatch, cliente)  # cliente (mesmo admin) não vê
+    assert c.get("/docs/swagger").status_code == 404
+    assert c.get("/docs/openapi.json").status_code == 404
+
+    c = _prod_docs_client(monkeypatch, None)  # sem login
+    assert c.get("/docs/swagger").status_code == 404
+    assert c.get("/health").status_code == 200  # o resto da API segue normal

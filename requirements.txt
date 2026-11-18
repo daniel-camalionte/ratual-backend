@@ -9,3 +9,8 @@ pydantic==2.13.5
 pydantic-settings==2.11.0
 flask-openapi3==4.2.1
 flask-openapi3-swagger==5.31.0
+SQLAlchemy==2.0.57
+PyMySQL==1.2.4
+pycryptodome==3.19.0
+requests==2.31.0
+greenlet==3.2.4

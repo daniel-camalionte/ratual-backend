@@ -21,6 +21,11 @@ DEPENDENCIES = {
     "pydantic_settings": "pydantic-settings",
     "flask_openapi3": "flask-openapi3",
     "flask_openapi3_swagger": "flask-openapi3-swagger",
+    "sqlalchemy": "SQLAlchemy",
+    "pymysql": "PyMySQL",
+    "greenlet": "greenlet",
+    "Crypto": "pycryptodome",
+    "requests": "requests",
 }
 
 

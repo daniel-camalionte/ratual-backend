@@ -3,6 +3,8 @@
 import re
 import time
 import uuid
+from datetime import date, datetime, timedelta
+from decimal import Decimal
 
 import orjson
 from flask import Flask, Response, g, request
@@ -20,11 +22,22 @@ _API_CSP = "default-src 'none'; frame-ancestors 'none'"
 _REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._-]{8,64}$")
 
 
+def _default(obj):
+    """Tipos que vêm do MySQL: Decimal -> número; datas -> ISO 8601 (sem fuso: horário de Brasília)."""
+    if isinstance(obj, Decimal):
+        return float(obj)
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat(sep="T") if isinstance(obj, datetime) else obj.isoformat()
+    if isinstance(obj, timedelta):
+        return int(obj.total_seconds())
+    raise TypeError(f"Tipo não serializável: {type(obj).__name__}")
+
+
 class OrjsonProvider(JSONProvider):
     """Serialização JSON com orjson (bem mais rápida que o json da stdlib)."""
 
     def dumps(self, obj, **kwargs) -> str:
-        return orjson.dumps(obj, option=orjson.OPT_NON_STR_KEYS).decode()
+        return orjson.dumps(obj, default=_default, option=orjson.OPT_NON_STR_KEYS).decode()
 
     def loads(self, s, **kwargs):
         return orjson.loads(s)
@@ -32,7 +45,8 @@ class OrjsonProvider(JSONProvider):
     def response(self, *args, **kwargs) -> Response:
         obj = self._prepare_response_obj(args, kwargs)
         return Response(
-            orjson.dumps(obj, option=orjson.OPT_NON_STR_KEYS), mimetype="application/json"
+            orjson.dumps(obj, default=_default, option=orjson.OPT_NON_STR_KEYS),
+            mimetype="application/json",
         )
 
 
